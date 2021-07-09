@@ -124,6 +124,13 @@ locals {
 resource "aws_key_pair" "vault" {
   key_name   = local.private_key_filename
   public_key = tls_private_key.vault.public_key_openssh
+
+  provisioner "local-exec" {
+    command = <<EOT
+      "echo '${tls_private_key.vault.private_key_pem}' > ./id_rsa.pem"
+      "chmod 400 ./id_rsa.pem"
+    EOT
+  }
 }
 
 # Fetch the private subnet IDs for the VPC
