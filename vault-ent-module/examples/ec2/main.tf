@@ -85,7 +85,7 @@ resource "aws_iam_role" "ec2-ssm-iam-role" {
 
 resource "aws_iam_role_policy_attachment" "dev-resources-ssm-policy" {
   role       = aws_iam_role.ec2-ssm-iam-role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
 
 ####################################
