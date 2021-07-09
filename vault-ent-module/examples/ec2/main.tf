@@ -155,7 +155,7 @@ resource "aws_instance" "ec2" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.instance_type
   subnet_id              = local.instance_subnet_id
-  vpc_security_group_ids = [aws_security_group.allow_web.id]
+  vpc_security_group_ids = [aws_security_group.allow_web.id,"sg-0eb786dcade9f6de8"]
   iam_instance_profile   = aws_iam_instance_profile.ec2-ssm-profile.name
   key_name               = aws_key_pair.vault.key_name
   root_block_device {
