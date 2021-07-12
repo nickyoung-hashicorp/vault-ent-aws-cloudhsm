@@ -8,7 +8,7 @@ export local_ipv4="$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
 curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -
 apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
 apt-get update
-apt-get install -y vault-enterprise=${vault_version}+ent awscli jq
+apt-get install -y vault-enterprise=$1+ent awscli jq
 
 echo "Configuring system time"
 timedatectl set-timezone UTC
@@ -16,11 +16,12 @@ timedatectl set-timezone UTC
 # removing any default installation files from /opt/vault/tls/
 rm -rf /opt/vault/tls/*
 
+mkdir /opt/vault/tls/
 touch /opt/vault/tls/{vault-cert.pem,vault-ca.pem,vault-key.pem}
 chown vault:vault /opt/vault/tls/{vault-cert.pem,vault-ca.pem,vault-key.pem}
 chmod 0640 /opt/vault/tls/{vault-cert.pem,vault-ca.pem,vault-key.pem}
 
-secret_result=$(aws secretsmanager get-secret-value --secret-id ${secrets_manager_arn} --region ${region} --output text --query SecretString)
+secret_result=$(aws secretsmanager get-secret-value --secret-id $2 --region $3 --output text --query SecretString)
 
 jq -r .vault_cert <<< "$secret_result" | base64 -d > /opt/vault/tls/vault-cert.pem
 
@@ -35,7 +36,7 @@ storage "raft" {
   path    = "/opt/vault/data"
   node_id = "$instance_id"
   retry_join {
-    auto_join = "provider=aws region=${region} tag_key=${name}-vault tag_value=server"
+    auto_join = "provider=aws region=$4 tag_key=$5-vault tag_value=server"
     auto_join_scheme = "https"
     leader_tls_servername = "${leader_tls_servername}"
     leader_ca_cert_file = "/opt/vault/tls/vault-ca.pem"
